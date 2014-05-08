@@ -46,7 +46,10 @@ var IPython = (function (IPython) {
         $('div#notebook').addClass('border-box-sizing');
     };
 
-
+    Notebook.prototype.get_Kernel = function () {
+    	return this.kernel;
+    };
+        
     Notebook.prototype.create_elements = function () {
         // We add this end_space div to the end of the notebook div to:
         // i) provide a margin between the last cell and the end of the notebook
@@ -537,6 +540,7 @@ var IPython = (function (IPython) {
             };
             this.dirty = true;
         };
+        console.log("DELETING CELL");
         return this;
     };
 

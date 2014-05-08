@@ -1,6 +1,7 @@
-var MSG_EXECUTE_CODE = "EXE";		// message to execute the sent code to the console
-var MSG_EXECUTE_CODE_R = "EXR";		// message to execute the sent code to R console
-var MSG_DEFAULT_LANGUAGE = "LAN";	// message to indicate the default language of the user
+var MSG_EXECUTE_CODE = "EXE";		   // message to execute the sent code to the console
+var MSG_EXECUTE_CODE_R = "EXR";	 	   // message to execute the sent code to R console
+var MSG_DEFAULT_LANGUAGE = "LAN"; 	   // message to indicate the default language of the user
+var MSG_DEFAULT_USER_ENVIRONMENT = "ENV"   // message to indicate the content of the environment variable that contains the iMathCloud user root path
 
 var IPython = (function (IPython) {
 
@@ -29,12 +30,18 @@ var IPython = (function (IPython) {
 		case MSG_DEFAULT_LANGUAGE:
 			CoreInteraction.prototype.setDefaultLanguage(message);
 			break;
+		case MSG_DEFAULT_USER_ENVIRONMENT:
+			CoreInteraction.prototype.setEnvironmentVariable(message);
+			break;		
 		};
 	};
+
+
 	
 	CoreInteraction.prototype.setDefaultLanguage = function (message) {
 		// Pretty ugly, but for the alpha release is fine! 
 		window.setTimeout(function(){$('#cell_type').val(message); $('#cell_type').change();} ,350);
+		console.log("SET DEFAULT LANGUAGE");
 		//$('#cell_type').val(message);
 		//$('#cell_type').change();
 		//IPython.notebook.currentCode = message;		// Currently: 'code' for Python, 'codeR' for R
@@ -43,9 +50,9 @@ var IPython = (function (IPython) {
 	CoreInteraction.prototype.executeCellFromCore = function (message) {
 
 		IPython.notebook.insert_cell_below('code');
-		var cell = IPython.notebook.get_selected_cell();
-		cell.set_text(message);
-		IPython.notebook.execute_selected_cell({isFile:true});
+                var cell = IPython.notebook.get_selected_cell();
+                cell.set_text(message);
+                IPython.notebook.execute_selected_cell({isFile:true});	
 	};
 	
 	CoreInteraction.prototype.executeCellRFromCore = function (message) {
@@ -55,8 +62,42 @@ var IPython = (function (IPython) {
 		cell.set_text(message);
 		IPython.notebook.execute_selected_cell({isFile:true});
 		IPython.notebook.insert_cell_below(IPython.notebook.currentCode);
-        IPython.notebook.scroll_to_bottom();
+        	IPython.notebook.scroll_to_bottom();
 	};
+
+	CoreInteraction.prototype.setEnvironmentVariable = function (message) {
+		
+		
+		var id = setInterval(function () {
+			k = IPython.notebook.get_Kernel();
+			sh_ch = k.get_shellChannel();
+			if(k != null && sh_ch != null && sh_ch.readyState == 1) {							
+				var var_env = "import os; os.environ[\"USER_ROOT\"] = \"" + message + "\";";
+				var path_env = "import sys; sys.path.append(\"/home/andrea/git/hpc2\");";
+				var import_imath = "from HPC2.imath.iMath import iMath;";			
+				var sentence = var_env.concat(path_env, import_imath);
+				console.log(sentence);
+				
+				IPython.notebook.insert_cell_below('code');
+				var cell = IPython.notebook.get_selected_cell();				
+				cell.set_text(sentence);				
+				IPython.notebook.execute_selected_cell({isFile:true});		
+
+				index = IPython.notebook.find_cell_index(cell);			
+				IPython.notebook.delete_cell(index);
+
+				var cell_next = IPython.notebook.get_selected_cell();
+				index_next = IPython.notebook.find_cell_index(cell_next);            		
+				IPython.notebook.delete_cell(index_next);
+				
+				clearInterval(id);
+     			}			
+
+		}, 100);
+	
+	}
+
+
 
 	IPython.CoreInteraction = CoreInteraction;
 	return IPython;

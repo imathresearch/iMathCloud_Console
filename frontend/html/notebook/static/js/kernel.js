@@ -33,6 +33,10 @@ var IPython = (function (IPython) {
             alert('Your browser does not have WebSocket support, please try Chrome, Safari or Firefox ≥ 6. Firefox 4 and 5 are also supported by you have to enable WebSockets in about:config.');
         };
     };
+    
+    Kernel.prototype.get_shellChannel = function () {
+    	return this.shell_channel;
+    };
 
 
     Kernel.prototype._get_msg = function (msg_type, content) {
