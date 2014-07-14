@@ -20,6 +20,7 @@ import logging
 import Cookie
 import time
 import uuid
+import os
 
 from tornado import web
 from tornado import websocket
@@ -31,6 +32,8 @@ from IPython.external.decorator import decorator
 from IPython.zmq.session import Session
 from IPython.lib.security import passwd_check
 from IPython.utils.jsonutil import date_default
+
+from pwd import getpwnam
 
 try:
     from docutils.core import publish_string
@@ -551,13 +554,19 @@ class ShellHandler(AuthenticatedZMQStreamHandler):
 
     def initialize(self, *args, **kwargs):
         self.shell_stream = None
+        
 
     def on_first_message(self, msg):
+
         try:
             super(ShellHandler, self).on_first_message(msg)
         except web.HTTPError:
             self.close()
             return
+        self.imathUser= self.get_argument("imathuser",None)
+        
+        print "IMATH USER: ", self.imathUser
+                
         km = self.application.kernel_manager
         self.max_msg_size = km.max_msg_size
         kernel_id = self.kernel_id

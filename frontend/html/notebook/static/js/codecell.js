@@ -166,6 +166,7 @@ var IPython = (function (IPython) {
             'set_next_input': $.proxy(this._handle_set_next_input, this)
         };
         // imath: TODO: DO IT IN SERVER SIDE
+        IPython.notebook.userName =""
         if (typeof IPython.notebook.userName === 'undefined') {
         	alert("Login is required within iMathCloud")
         } else {
@@ -176,8 +177,8 @@ var IPython = (function (IPython) {
         		var extra = "uid = getpwnam('" + user + "')[2];"+
 							"gid = getpwnam('" + user + "')[3];" + 
 							"os.setegid(gid); "+ 
-							"os.seteuid(uid); " 
-				var msg_id = this.kernel.execute(extra + this.get_text(), callbacks, {silent: false});
+							"os.seteuid(uid); "
+				var msg_id = this.kernel.execute(this.get_text(), callbacks, {silent: false});
         	}
         }
         

@@ -66,19 +66,19 @@ var IPython = (function (IPython) {
 	};
 
 	CoreInteraction.prototype.setEnvironmentVariable = function (message) {
-
+		var userName = message.split(";")[1]
+		IPython.notebook.userName = userName
 		var id = setInterval(function () {
 			var url = message.split(";")[0]
-			var userName = message.split(";")[1]
-			IPython.notebook.userName = username
 			k = IPython.notebook.get_Kernel();
 			sh_ch = k.get_shellChannel();
 			if(k != null && sh_ch != null && sh_ch.readyState == 1) {							
 				var var_env = "import os; os.environ[\"USER_ROOT\"] = \"" + url + "\";";
-				var path_env = "import sys; from pwd import getpwnam;");";
+				var path_env = "import sys;";
 				//var path_env = "import sys; sys.path.append(\"/home/andrea/git/hpc2\");";
 				var import_imath = "from HPC2.imath.iMath import iMath;";			
 				var sentence = var_env.concat(path_env, import_imath);
+				alert(sentence);
 				console.log(sentence);
 				
 				IPython.notebook.insert_cell_below('code');
