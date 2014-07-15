@@ -165,7 +165,6 @@ var IPython = (function (IPython) {
             'clear_output': $.proxy(this.output_area.handle_clear_output, this.output_area),
             'set_next_input': $.proxy(this._handle_set_next_input, this)
         };
-        IPython.notebook.userName =""
         if (typeof IPython.notebook.userName === 'undefined') {
         	alert("Login is required within iMathCloud")
         } else {
@@ -173,16 +172,10 @@ var IPython = (function (IPython) {
         	if (user == "ROOT") {
         		alert("Login is required within iMathCloud")
         	} else {
+        		alert(user);
 				var msg_id = this.kernel.execute(this.get_text(), callbacks, {silent: false});
         	}
         }
-        
-        
-         
-         
-        	
-        	
-        
     };
 
 
