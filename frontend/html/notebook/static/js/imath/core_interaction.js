@@ -78,7 +78,6 @@ var IPython = (function (IPython) {
 				//var path_env = "import sys; sys.path.append(\"/home/andrea/git/hpc2\");";
 				var import_imath = "from HPC2.imath.iMath import iMath;";			
 				var sentence = var_env.concat(path_env, import_imath);
-				alert(sentence);
 				console.log(sentence);
 				
 				IPython.notebook.insert_cell_below('code');
