@@ -79,8 +79,18 @@ var IPython = (function (IPython) {
 				var import_imath = "from HPC2.imath.iMath import iMath;";			
 				var sentence = var_env.concat(path_env, import_imath);
 				console.log(sentence);
+											
+				IPython.notebook.insert_cell_above('code');
+                var cell = IPython.notebook.get_selected_cell();
+                cell.set_text(sentence);
+                IPython.notebook.execute_selected_cell({isFile:true});
+
+                index = IPython.notebook.find_cell_index(cell);             
+                IPython.notebook.delete_cell(index);
 				
-				IPython.notebook.insert_cell_below('code');
+                clearInterval(id);
+                
+                /*IPython.notebook.insert_cell_below('code');
 				var cell = IPython.notebook.get_selected_cell();				
 				cell.set_text(sentence);				
 				IPython.notebook.execute_selected_cell({isFile:true});		
@@ -91,8 +101,8 @@ var IPython = (function (IPython) {
 				var cell_next = IPython.notebook.get_selected_cell();
 				index_next = IPython.notebook.find_cell_index(cell_next);            		
 				IPython.notebook.delete_cell(index_next);
+				*/
 				
-				clearInterval(id);
      			}			
 
 		}, 100);
