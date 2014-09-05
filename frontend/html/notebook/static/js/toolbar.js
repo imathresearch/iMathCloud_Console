@@ -102,7 +102,7 @@ var IPython = (function (IPython) {
             IPython.notebook.insert_cell_below('code');
         });
         this.element.find('#run_b').click(function () {
-            IPython.notebook.execute_selected_cell();
+            IPython.notebook.execute_selected_cell();           
         });
         this.element.find('#interrupt_b').click(function () {
             IPython.notebook.kernel.interrupt();

@@ -1126,6 +1126,7 @@ var IPython = (function (IPython) {
         };
         this.dirty = true;
         that.scroll_to_bottom();
+        
     };
 
 

@@ -182,6 +182,7 @@ var IPython = (function (IPython) {
         this.set_input_prompt(content.execution_count);
         this.element.removeClass("running");
         $([IPython.events]).trigger('set_dirty.Notebook', {'value': true});
+        IPython.notebook.save_notebook(); // By iMathResearch S.L.
     }
 
     CodeCell.prototype._handle_set_next_input = function (text) {
