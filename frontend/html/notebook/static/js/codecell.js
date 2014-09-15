@@ -237,7 +237,7 @@ var IPython = (function (IPython) {
     CodeCell.prototype.set_input_prompt = function (number) {
         this.input_prompt_number = number;
         var ns = number || "&nbsp;";
-        this.element.find('div.input_prompt').html('PY:[' + ns + ']');
+        //this.element.find('div.input_prompt').html('PY:[' + ns + ']');
     };
 
 
