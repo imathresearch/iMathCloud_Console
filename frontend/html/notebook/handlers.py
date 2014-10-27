@@ -20,7 +20,7 @@ import logging
 import Cookie
 import time
 import uuid
-import os
+import sys
 
 from tornado import web
 from tornado import websocket
@@ -32,8 +32,6 @@ from IPython.external.decorator import decorator
 from IPython.zmq.session import Session
 from IPython.lib.security import passwd_check
 from IPython.utils.jsonutil import date_default
-
-from pwd import getpwnam
 
 try:
     from docutils.core import publish_string
@@ -337,6 +335,7 @@ class MainKernelHandler(AuthenticatedHandler):
         notebook_id = self.get_argument('notebook', default=None)
         kernel_id = km.start_kernel(notebook_id, cwd=nbm.notebook_dir)
         data = {'ws_url':self.ws_url,'kernel_id':kernel_id}
+	print data
         self.set_header('Location', '/'+kernel_id)
         self.finish(jsonapi.dumps(data))
 
@@ -397,7 +396,7 @@ class ZMQStreamHandler(websocket.WebSocketHandler):
             msg = self._reserialize_reply(msg_list)
         except Exception:
             self.application.log.critical("Malformed message: %r" % msg_list, exc_info=True)
-        else:
+        else:	                
             self.write_message(msg)
 
     def allow_draft76(self):
@@ -457,9 +456,11 @@ class IOPubHandler(AuthenticatedZMQStreamHandler):
         self.hb_stream = None
 
     def on_first_message(self, msg):
+	#print "IOPub on first message"
+	#print msg
         try:
             super(IOPubHandler, self).on_first_message(msg)
-        except web.HTTPError:
+        except web.HTTPError:	    
             self.close()
             return
         km = self.application.kernel_manager
@@ -486,6 +487,8 @@ class IOPubHandler(AuthenticatedZMQStreamHandler):
         # This method can be called twice, once by self.kernel_died and once
         # from the WebSocket close event. If the WebSocket connection is
         # closed before the ZMQ streams are setup, they could be None.
+	#print "IOPUB on close"
+	#print self._kernel_alive
         self.stop_hb()
         if self.iopub_stream is not None and not self.iopub_stream.closed():
             self.iopub_stream.on_recv(None)
@@ -494,6 +497,7 @@ class IOPubHandler(AuthenticatedZMQStreamHandler):
             self.hb_stream.close()
 
     def start_hb(self, callback):
+	#print "IOPUB start hb"
         """Start the heartbeating and call the callback if the kernel dies."""
         if not self._beating:
             self._kernel_alive = True
@@ -523,15 +527,18 @@ class IOPubHandler(AuthenticatedZMQStreamHandler):
             self._beating= True
     
     def _really_start_hb(self):
+	#print "IOPub really start hb"
         """callback for delayed heartbeat start
         
         Only start the hb loop if we haven't been closed during the wait.
         """
         if self._beating and not self.hb_stream.closed():
+	    #print "Loop hb_periodic"	
             self._hb_periodic_callback.start()
 
     def stop_hb(self):
         """Stop the heartbeating and cancel all related callbacks."""
+	#print "IOPub stop hb"
         if self._beating:
             self._beating = False
             self._hb_periodic_callback.stop()
@@ -539,6 +546,7 @@ class IOPubHandler(AuthenticatedZMQStreamHandler):
                 self.hb_stream.on_recv(None)
 
     def kernel_died(self):
+	#print "IOPub kernel died"
         self.application.kernel_manager.delete_mapping_for_kernel(self.kernel_id)
         self.application.log.error("Kernel %s failed to respond to heartbeat", self.kernel_id)
         self.write_message(
@@ -554,19 +562,16 @@ class ShellHandler(AuthenticatedZMQStreamHandler):
 
     def initialize(self, *args, **kwargs):
         self.shell_stream = None
-        
 
     def on_first_message(self, msg):
-
-        try:
+	
+	#print "First message shell "
+	#print msg
+	try:
             super(ShellHandler, self).on_first_message(msg)
         except web.HTTPError:
             self.close()
             return
-        self.imathUser= self.get_argument("imathuser",None)
-        
-        print "IMATH USER: ", self.imathUser
-                
         km = self.application.kernel_manager
         self.max_msg_size = km.max_msg_size
         kernel_id = self.kernel_id
@@ -584,11 +589,15 @@ class ShellHandler(AuthenticatedZMQStreamHandler):
     def on_message(self, msg):
         if len(msg) < self.max_msg_size:
             msg = jsonapi.loads(msg)
+	    #print "Other message shell "
+	    #print msg
             self.session.send(self.shell_stream, msg)
 
     def on_close(self):
+	#print "Shell on close"
         # Make sure the stream exists and is not already closed.
         if self.shell_stream is not None and not self.shell_stream.closed():
+	    #print "Calling close on close"
             self.shell_stream.close()
 
 
@@ -743,4 +752,5 @@ class RSTHandler(AuthenticatedHandler):
         print html
         self.set_header('Content-Type', 'text/html')
         self.finish(html)
+
 

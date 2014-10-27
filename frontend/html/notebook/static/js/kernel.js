@@ -9,6 +9,8 @@
 // Kernel
 //============================================================================
 
+var IMATH_PORT = "8080";
+
 var IPython = (function (IPython) {
 
     var utils = IPython.utils;
@@ -24,7 +26,7 @@ var IPython = (function (IPython) {
         this.username = "username";
         this.session_id = utils.uuid();
         this._msg_callbacks = {};
-
+	
         if (typeof(WebSocket) !== 'undefined') {
             this.WebSocket = WebSocket;
         } else if (typeof(MozWebSocket) !== 'undefined') {
@@ -57,7 +59,7 @@ var IPython = (function (IPython) {
         var that = this;
         if (!this.running) {
             var qs = $.param({notebook:notebook_id});
-            var url = this.base_url + '?' + qs;
+            var url = this.base_url + '?' + qs;   	    
             $.post(url,
                 $.proxy(that._kernel_started,that),
                 'json'
@@ -81,18 +83,27 @@ var IPython = (function (IPython) {
 
 
     Kernel.prototype._kernel_started = function (json) {
-        console.log("Kernel started: ", json.kernel_id);
-        this.running = true;
-        this.kernel_id = json.kernel_id;
-        this.ws_url = json.ws_url;
-        this.kernel_url = this.base_url + "/" + this.kernel_id;
-        this.start_channels();
-        this.shell_channel.onmessage = $.proxy(this._handle_shell_reply,this);
-        this.iopub_channel.onmessage = $.proxy(this._handle_iopub_reply,this);
+	
+	var that = this;
+	var id = setInterval(function (){
+		if(portConsole != undefined){
+			clearInterval(id);
+			//console.log("Kernel started: ", json.kernel_id);
+			//console.log("PORT console " + portConsole);
+			that.running = true;
+			that.kernel_id = json.kernel_id;
+			that.ws_url = json.ws_url;
+			that.kernel_url = that.base_url + "/" + that.kernel_id;
+			that.start_channels();
+			that.shell_channel.onmessage = $.proxy(that._handle_shell_reply,that);
+			that.iopub_channel.onmessage = $.proxy(that._handle_iopub_reply,that);
+		}
+	}, 100);
+       
     };
 
 
-    Kernel.prototype._websocket_closed = function(ws_url, early){
+    Kernel.prototype._websocket_closed = function(ws_url, early){	
         var msg;
         var parent_item = $('body');
         if (early) {
@@ -102,6 +113,7 @@ var IPython = (function (IPython) {
             " or if the url does not look right, there could be an error in the" +
             " server's configuration.";
         } else {
+	    console.log("Reconnectin websockets");	
             IPython.notification_widget.set_message('Reconnecting Websockets', 1000);
             this.start_channels();
             return;
@@ -127,21 +139,35 @@ var IPython = (function (IPython) {
     Kernel.prototype.start_channels = function () {
         var that = this;
         this.stop_channels();
-        var ws_url = this.ws_url + this.kernel_url;
-        console.log("Starting WS:", ws_url);
+	
+	//var url = urlConsole.replace( /http:\/\//g, "" );
+	//console.log("URL sin http " + url );
+        var url_complete_shell = "ws://127.0.0.1:" + IMATH_PORT + "/iMathCloud/websocket/" + this.kernel_id + "/shell/" + portConsole;
+	var url_complete_iopub = "ws://127.0.0.1:" + IMATH_PORT + "/iMathCloud/websocket/" + this.kernel_id + "/iopub/" + portConsole; 
+	//console.log("URL COMPLETA " + url_complete_shell);
+	var ws_url = this.ws_url + this.kernel_url;
+        //console.log("Starting WS:", ws_url);
     
-        this.shell_channel = new this.WebSocket(ws_url + "/shell?imathuser=" + IPython.notebook.userName);
-        this.iopub_channel = new this.WebSocket(ws_url + "/iopub");
-        send_cookie = function(){
+        //this.shell_channel = new this.WebSocket(ws_url + "/shell?imathuser=" + IPython.notebook.userName);
+	//this.iopub_channel = new this.WebSocket(ws_url + "/iopub");
+	
+	this.shell_channel = new this.WebSocket(url_complete_shell);
+        this.iopub_channel = new this.WebSocket(url_complete_iopub);
+
+	send_cookie = function(){
             this.send(document.cookie);
         };
+
         var already_called_onclose = false; // only alert once
-        ws_closed_early = function(evt){
+        ws_closed_early = function(evt){	
             if (already_called_onclose){
                 return;
             }
             already_called_onclose = true;
             if ( ! evt.wasClean ){
+		console.log("Closing client Code and reason");
+		console.log(evt.code);
+		console.log(evt.reason);
                 that._websocket_closed(ws_url, true);
             }
         };
@@ -151,15 +177,19 @@ var IPython = (function (IPython) {
             }
             already_called_onclose = true;
             if ( ! evt.wasClean ){
+		console.log("Closing client Code and reason");
+                console.log(evt.code);
+                console.log(evt.reason);
                 that._websocket_closed(ws_url, false);
             }
         };
+	this.shell_channel.onerror = function(evt) { console.log("ON ERROR " + evt.data); };
         this.shell_channel.onopen = send_cookie;
         this.shell_channel.onclose = ws_closed_early;
         this.iopub_channel.onopen = send_cookie;
         this.iopub_channel.onclose = ws_closed_early;
-        // switch from early-close to late-close message after 1s
-        setTimeout(function(){
+        // switch from early-close to late-close message after 1s        
+	setTimeout(function(){
             that.shell_channel.onclose = ws_closed_late;
             that.iopub_channel.onclose = ws_closed_late;
         }, 1000);
@@ -241,7 +271,6 @@ var IPython = (function (IPython) {
         //
         // The set_next_input_callback will bepassed the text that should become the next
         // input cell.
-
         var content = {
             code : code,
             silent : true,
@@ -249,7 +278,7 @@ var IPython = (function (IPython) {
             user_expressions : {},
             allow_stdin : false
         };
-		$.extend(true, content, options)
+	$.extend(true, content, options)
         var msg = this._get_msg("execute_request", content);
         this.shell_channel.send(JSON.stringify(msg));
         this.set_callbacks_for_msg(msg.header.msg_id, callbacks);
@@ -315,7 +344,14 @@ var IPython = (function (IPython) {
 
 
     Kernel.prototype._handle_shell_reply = function (e) {
+	//console.log("SHELL:Receiving response from server");		
         reply = $.parseJSON(e.data);
+		
+	if(reply.ping === "[IMATH]Ping"){		
+		this.shell_channel.send("[IMATH]Ping");
+		return;
+	}
+
         var header = reply.header;
         var content = reply.content;
         var msg_type = header.msg_type;
@@ -352,7 +388,14 @@ var IPython = (function (IPython) {
 
 
     Kernel.prototype._handle_iopub_reply = function (e) {
-        reply = $.parseJSON(e.data);
+	//console.log("IOPUB: receving response from server");	
+        reply = $.parseJSON(e.data);		
+	
+	if(reply.ping === "[IMATH]Ping"){
+		this.iopub_channel.send("[IMATH]Ping");		
+		return;
+	}
+	
         var content = reply.content;
         var msg_type = reply.header.msg_type;
         var callbacks = this.get_callbacks_for_msg(reply.parent_header.msg_id);

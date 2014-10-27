@@ -93,3 +93,4 @@ class ZMQDealerHandler(ZMQHandler):
             stream = self.get_stream()
             stream.send_json(msg)
             stream.on_recv(self._handle_msgs)
+

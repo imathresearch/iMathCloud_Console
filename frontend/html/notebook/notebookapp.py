@@ -135,7 +135,6 @@ class NotebookWebApplication(web.Application):
             (r"/notebooks", NotebookRootHandler),
             (r"/notebooks/%s" % _notebook_id_regex, NotebookHandler),
             (r"/rstservice/render", RSTHandler),
-			(r"/files/temp/(.*)", AuthenticatedFileHandler, {'path' : '/home/temp'}),
             (r"/files/(.*)", AuthenticatedFileHandler, {'path' : notebook_manager.notebook_dir}),
             (r"/clusters", MainClusterHandler),
             (r"/clusters/%s/%s" % (_profile_regex, _cluster_action_regex), ClusterActionHandler),
@@ -151,14 +150,10 @@ class NotebookWebApplication(web.Application):
         # Note that the URLs these patterns check against are escaped,
         # and thus guaranteed to be ASCII: 'héllo' is really 'h%C3%A9llo'.
         base_project_url = py3compat.unicode_to_str(base_project_url, 'ascii')
-
-        if os.path.exists("/usr/share/javascript/mathjax/MathJax.js"):
-          handlers.append((r"/mathjax/(.*)", web.StaticFileHandler,
-                           {"path": "/usr/share/javascript/mathjax"}))
         
         settings = dict(
             template_path=os.path.join(os.path.dirname(__file__), "templates"),
-            static_path=os.path.join("/usr/share/ipython/notebook/static"),
+            static_path=os.path.join(os.path.dirname(__file__), "static"),
             cookie_secret=os.urandom(1024),
             login_url="%s/login"%(base_project_url.rstrip('/')),
         )
@@ -367,15 +362,12 @@ class NotebookApp(BaseIPythonApplication):
     def _mathjax_url_default(self):
         if not self.enable_mathjax:
             return u''
-        static_path = self.webapp_settings.get("static_path", "/usr/share/ipython/notebook/static")
+        static_path = self.webapp_settings.get("static_path", os.path.join(os.path.dirname(__file__), "static"))
         static_url_prefix = self.webapp_settings.get("static_url_prefix",
                                                      "/static/")
         if os.path.exists(os.path.join(static_path, 'mathjax', "MathJax.js")):
             self.log.info("Using local MathJax")
             return static_url_prefix+u"mathjax/MathJax.js"
-        elif os.path.exists("/usr/share/javascript/mathjax/MathJax.js"):
-            self.log.info("Using system MathJax")
-            return u"/mathjax/MathJax.js"
         else:
             if self.certfile:
                 # HTTPS: load from Rackspace CDN, because SSL certificate requires it
@@ -598,3 +590,4 @@ def launch_new_instance():
     app = NotebookApp.instance()
     app.initialize()
     app.start()
+

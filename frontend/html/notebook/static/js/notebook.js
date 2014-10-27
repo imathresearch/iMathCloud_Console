@@ -49,6 +49,8 @@ var IPython = (function (IPython) {
     Notebook.prototype.get_Kernel = function () {
     	return this.kernel;
     };
+
+
         
     Notebook.prototype.create_elements = function () {
         // We add this end_space div to the end of the notebook div to:
@@ -1105,6 +1107,7 @@ var IPython = (function (IPython) {
         var cell_index = that.find_cell_index(cell);
         var code;
         if (cell instanceof IPython.CodeCell) {
+	    //console.log("Executing python cell");
             cell.execute();
             code = 'code';			// For Python console
         } else if (cell instanceof IPython.CodeCellR) {
@@ -1126,7 +1129,6 @@ var IPython = (function (IPython) {
         };
         this.dirty = true;
         that.scroll_to_bottom();
-        
     };
 
 
@@ -1257,7 +1259,7 @@ var IPython = (function (IPython) {
             error : $.proxy(this.save_notebook_error,this)
         };
         $([IPython.events]).trigger('notebook_saving.Notebook');
-        var url = $('body').data('baseProjectUrl') + 'notebooks/' + this.notebook_id;
+        var url = $('body').data('baseProjectUrl') + 'save_notebooks/' + this.notebook_id;
         $.ajax(url, settings);
     };
 

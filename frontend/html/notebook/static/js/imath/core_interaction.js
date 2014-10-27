@@ -2,6 +2,9 @@ var MSG_EXECUTE_CODE = "EXE";		   // message to execute the sent code to the con
 var MSG_EXECUTE_CODE_R = "EXR";	 	   // message to execute the sent code to R console
 var MSG_DEFAULT_LANGUAGE = "LAN"; 	   // message to indicate the default language of the user
 var MSG_DEFAULT_USER_ENVIRONMENT = "ENV"   // message to indicate the content of the environment variable that contains the iMathCloud user root path
+var MSG_PORTCONSOLE = "PRT";
+
+var portConsole;
 
 var IPython = (function (IPython) {
 
@@ -32,6 +35,10 @@ var IPython = (function (IPython) {
 			break;
 		case MSG_DEFAULT_USER_ENVIRONMENT:
 			CoreInteraction.prototype.setEnvironmentVariable(message);
+			break;
+		case MSG_PORTCONSOLE:
+			portConsole = message;
+			//console.log("MSG_PORTCONSOLE " + portConsole);
 			break;		
 		};
 	};
@@ -41,7 +48,7 @@ var IPython = (function (IPython) {
 	CoreInteraction.prototype.setDefaultLanguage = function (message) {
 		// Pretty ugly, but for the alpha release is fine! 
 		window.setTimeout(function(){$('#cell_type').val(message); $('#cell_type').change();} ,350);
-		console.log("SET DEFAULT LANGUAGE");
+		//console.log("SET DEFAULT LANGUAGE " + message);
 		//$('#cell_type').val(message);
 		//$('#cell_type').change();
 		//IPython.notebook.currentCode = message;		// Currently: 'code' for Python, 'codeR' for R
@@ -74,35 +81,30 @@ var IPython = (function (IPython) {
 			sh_ch = k.get_shellChannel();
 			if(k != null && sh_ch != null && sh_ch.readyState == 1) {							
 				var var_env = "import os; os.environ[\"USER_ROOT\"] = \"" + url + "\";";
-				var path_env = "import sys;";
-				//var path_env = "import sys; sys.path.append(\"/home/andrea/git/hpc2\");";
+				//var path_env = "import sys;";
+				var path_env = "import sys; sys.path.append(\"/home/andrea/git/hpc2\");";
 				var import_imath = "from HPC2.imath.iMath import iMath;";			
 				var sentence = var_env.concat(path_env, import_imath);
-				console.log(sentence);
-											
-				IPython.notebook.insert_cell_above('code');
-                var cell = IPython.notebook.get_selected_cell();
-                cell.set_text(sentence);
-                IPython.notebook.execute_selected_cell({isFile:true});
-
-                index = IPython.notebook.find_cell_index(cell);             
-                IPython.notebook.delete_cell(index);
+				//console.log(sentence);
 				
-                clearInterval(id);
-                
-                /*IPython.notebook.insert_cell_below('code');
+				IPython.notebook.insert_cell_above('code');
 				var cell = IPython.notebook.get_selected_cell();				
 				cell.set_text(sentence);				
 				IPython.notebook.execute_selected_cell({isFile:true});		
 
+		
+				
 				index = IPython.notebook.find_cell_index(cell);			
+				//console.log(index)
+				//console.log("celda 1 " + cell.get_text())
 				IPython.notebook.delete_cell(index);
 
-				var cell_next = IPython.notebook.get_selected_cell();
-				index_next = IPython.notebook.find_cell_index(cell_next);            		
-				IPython.notebook.delete_cell(index_next);
-				*/
+				//var cell_next = IPython.notebook.get_selected_cell();
+				//index_next = IPython.notebook.find_cell_index(cell_next);            		
+				//console.log("celda 2 " + cell_next.get_text())
+				//IPython.notebook.delete_cell(index_next);
 				
+				clearInterval(id);
      			}			
 
 		}, 100);
@@ -115,4 +117,3 @@ var IPython = (function (IPython) {
 	return IPython;
 
 }(IPython));
-

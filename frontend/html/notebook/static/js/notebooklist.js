@@ -96,6 +96,7 @@ var IPython = (function (IPython) {
             success : $.proxy(this.list_loaded, this)
         };
         var url = $('body').data('baseProjectUrl') + 'notebooks';
+	console.log("Load notebooks url " + url);
         $.ajax(url, settings);
     };
 
