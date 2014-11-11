@@ -83,7 +83,7 @@ var IPython = (function (IPython) {
 				var var_env = "import os; os.environ[\"USER_ROOT\"] = \"" + url + "\";";
 				//var path_env = "import sys;";
 				var path_env = "import sys; sys.path.append(\"/home/andrea/git/hpc2\");";
-				var import_imath = "from HPC2.imath.iMath import iMath;";			
+				var import_imath = "from HPC2.imath.iMath import iMath; from JSAnimation import IPython_display";			
 				var sentence = var_env.concat(path_env, import_imath);
 				//console.log(sentence);
 				
