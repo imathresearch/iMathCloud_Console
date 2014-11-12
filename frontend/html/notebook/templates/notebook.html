@@ -250,7 +250,13 @@ data-notebook-id={{notebook_id}}
 <script src="{{ static_url("js/contexthint.js") }} charset="utf-8"></script>
 
 <script>
+// By iMathResearch
 var path_to_temp_svg = '{{ static_url("temp_svg/") }}';
+var url
+var env = "import os; os.environ[\"USER_ROOT\"] = \"" + url + "\";";
+var path = "import sys; sys.path.append(\"/home/andrea/git/hpc2\"); from HPC2.imath.iMath import iMath; from JSAnimation import IPython_display;";
+var portConsole
+var userName
 </script>
 
 

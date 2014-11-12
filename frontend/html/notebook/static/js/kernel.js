@@ -84,21 +84,16 @@ var IPython = (function (IPython) {
 
     Kernel.prototype._kernel_started = function (json) {
 	
-	var that = this;
-	var id = setInterval(function (){
-		if(portConsole != undefined){
-			clearInterval(id);
-			//console.log("Kernel started: ", json.kernel_id);
-			//console.log("PORT console " + portConsole);
-			that.running = true;
-			that.kernel_id = json.kernel_id;
-			that.ws_url = json.ws_url;
-			that.kernel_url = that.base_url + "/" + that.kernel_id;
-			that.start_channels();
-			that.shell_channel.onmessage = $.proxy(that._handle_shell_reply,that);
-			that.iopub_channel.onmessage = $.proxy(that._handle_iopub_reply,that);
-		}
-	}, 100);
+	var that = this;	
+	that.running = true;
+	that.kernel_id = json.kernel_id;
+	that.ws_url = json.ws_url;
+	that.kernel_url = that.base_url + "/" + that.kernel_id;	
+	IPython.notebook.userName = userName; // By iMathResearch
+	that.start_channels();
+	that.shell_channel.onmessage = $.proxy(that._handle_shell_reply,that);
+	that.iopub_channel.onmessage = $.proxy(that._handle_iopub_reply,that);
+	that._default_import(); // By iMathResearch
        
     };
 
@@ -136,20 +131,38 @@ var IPython = (function (IPython) {
 
     };
 
+    // By iMathResearch
+    Kernel.prototype._default_import = function(){
+	
+	var id = setInterval(function () {		
+		k = IPython.notebook.get_Kernel();
+		if (k != null){
+		    sh_ch = k.get_shellChannel();
+		    if(sh_ch != null && sh_ch.readyState == 1){			
+			var sentence = env.concat(path);	
+			IPython.notebook.insert_cell_above('code');
+			var cell = IPython.notebook.get_selected_cell();				
+			cell.set_text(sentence);				
+			IPython.notebook.execute_selected_cell({isFile:true});			
+			index = IPython.notebook.find_cell_index(cell);					
+			IPython.notebook.delete_cell(index);
+		    	clearInterval(id);
+		    }
+
+		}
+	}, 100);		
+
+    };
+
     Kernel.prototype.start_channels = function () {
         var that = this;
         this.stop_channels();
+        
 	
-	//var url = urlConsole.replace( /http:\/\//g, "" );
-	//console.log("URL sin http " + url );
         var url_complete_shell = "ws://127.0.0.1:" + IMATH_PORT + "/iMathCloud/websocket/" + this.kernel_id + "/shell/" + portConsole;
 	var url_complete_iopub = "ws://127.0.0.1:" + IMATH_PORT + "/iMathCloud/websocket/" + this.kernel_id + "/iopub/" + portConsole; 
-	//console.log("URL COMPLETA " + url_complete_shell);
-	var ws_url = this.ws_url + this.kernel_url;
-        //console.log("Starting WS:", ws_url);
-    
-        //this.shell_channel = new this.WebSocket(ws_url + "/shell?imathuser=" + IPython.notebook.userName);
-	//this.iopub_channel = new this.WebSocket(ws_url + "/iopub");
+	
+	var ws_url = this.ws_url + this.kernel_url;       
 	
 	this.shell_channel = new this.WebSocket(url_complete_shell);
         this.iopub_channel = new this.WebSocket(url_complete_iopub);
