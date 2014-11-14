@@ -19,8 +19,15 @@ window.mathjax_url = "{{mathjax_url}}";
 <link rel="stylesheet" href="{{ static_url("css/tooltip.css") }}" type="text/css" />
 <link rel="stylesheet" href="{{ static_url("css/renderedhtml.css") }}" type="text/css" />
 
-{% end %}
+<!-- By iMath Research S.L. -->
+<!-- bootstrap 3.0.2 -->
+<link rel="stylesheet" href="{{ static_url("css/bootstrap.min.css")}}" rel="stylesheet" type="text/css" />
+<!-- font Awesome -->
+<link rel="stylesheet" href="{{ static_url("css/font-awesome.min.css")}}" type="text/css" />
+<!-- Ionicons -->
+<link rel="stylesheet" href="{{ static_url("css/ionicons.min.css")}}" type="text/css" />
 
+{% end %}
 
 {% block params %}
 
@@ -144,26 +151,26 @@ data-notebook-id={{notebook_id}}
 
 
 <div id="toolbar">
-
+	<!-- By iMath Research S.L. -->
     <span>
-        <button id="save_b">Save</button>
+        <button id="save_b" class="btn btn-default" title="Save"><i class="fa fa-save"></i></button>
     </span>
-    <span id="cut_copy_paste">
-        <button id="cut_b" title="Cut Cell">Cut Cell</button>
-        <button id="copy_b" title="Copy Cell">Copy Cell</button>
-        <button id="paste_b" title="Paste Cell">Paste Cell</button>
+    <span id="cut_copy_paste" class="btn-group">
+        <button id="cut_b" class="btn btn-default" title="Cut Cell"><i class="fa fa-scissors"></i></button>
+        <button id="copy_b" class="btn btn-default" title="Copy Cell"><i class="fa fa-files-o"></i></button>
+        <button id="paste_b" class="btn btn-default" title="Paste Cell"><i class="fa fa-clipboard"></i></button>
     </span>
-    <span id="move_up_down">
-        <button id="move_up_b" title="Move Cell Up">Move Cell Up</button>
-        <button id="move_down_b" title="Move Cell Down">Move Down</button>
+    <span id="move_up_down" class="btn-group">
+        <button id="move_up_b"  class="btn btn-default" title="Move Cell Up"><i class="fa fa-arrow-up"></i></button>
+        <button id="move_down_b"  class="btn btn-default" title="Move Cell Down"><i class="fa fa-arrow-down"></i></button>
     </span>
-    <span id="insert_above_below">
-        <button id="insert_above_b" title="Insert Cell Above">Insert Cell Above</button>
-        <button id="insert_below_b" title="Insert Cell Below">Insert Cell Below</button>
+    <span id="insert_above_below" class="btn-group">
+        <button id="insert_above_b"  class="btn btn-default" title="Insert Cell Above"><i class="fa fa-caret-square-o-up"></i></button>
+        <button id="insert_below_b"  class="btn btn-default" title="Insert Cell Below"><i class="fa fa-caret-square-o-down"></i></button>
     </span>
-    <span id="run_int">
-        <button id="run_b" title="Run Cell">Run Cell</button>
-        <button id="interrupt_b" title="Interrupt">Interrupt</button>
+    <span id="run_int" class="btn-group">
+        <button id="run_b" class="btn btn-default" title="Run Cell"><i class="fa fa-play"></i></button>
+        <button id="interrupt_b" class="btn btn-default" title="Interrupt"><i class="fa fa-stop"></i></button>
     </span>
     <span>
         <select id="cell_type">
@@ -179,6 +186,7 @@ data-notebook-id={{notebook_id}}
              <option value="heading6">Heading 6</option>
         </select>
     </span>
+    <!-- By iMath Research S.L. -->
 	<!--span id="save_widget">
     	<span id="notebook_name"></span>
     	<span id="save_status"></span>

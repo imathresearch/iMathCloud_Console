@@ -20,56 +20,78 @@ var IPython = (function (IPython) {
         }
     };
 
+    var classesToRemove = ['ui-button', 'ui-widget', 'ui-state-default', 'ui-corner-all', 'ui-button-text-only'];
+
+    var removeClassesCreateHandler = function(event, ui) {
+    	var that = this;
+    	$.each(classesToRemove, function(idx, val) {
+        	$(that).removeClass(val);
+		$(that).css({"padding":"3px 12px"});
+		$(that).css({"background-color":"#f4f4f4"});
+    	});
+    };
+
 
     ToolBar.prototype.style = function () {
         this.element.addClass('border-box-sizing').
-            addClass('ui-widget ui-widget-content').
+            //addClass('ui-widget ui-widget-content').
+	    addClass('ui-widget-content').
             css('border-top-style','none').
             css('border-left-style','none').
             css('border-right-style','none');
         this.element.find('#cell_type').addClass('ui-widget ui-widget-content');
         this.element.find('#save_b').button({
-            icons : {primary: 'ui-icon-disk'},
+            //icons : {primary: 'ui-icon-disk'},
+	    create : removeClassesCreateHandler,	    
             text : false
         });
         this.element.find('#cut_b').button({
-            icons: {primary: 'ui-icon-scissors'},
+            //icons: {primary: 'ui-icon-scissors'},
+	    create : removeClassesCreateHandler,
             text : false
         });
         this.element.find('#copy_b').button({
-            icons: {primary: 'ui-icon-copy'},
-            text : false
+            //icons: {primary: 'ui-icon-copy'},
+            create : removeClassesCreateHandler,
+	    text : false
         });
         this.element.find('#paste_b').button({
-            icons: {primary: 'ui-icon-clipboard'},
+            //icons: {primary: 'ui-icon-clipboard'},
+	    create : removeClassesCreateHandler,
             text : false
         });
         this.element.find('#cut_copy_paste').buttonset();
         this.element.find('#move_up_b').button({
-            icons: {primary: 'ui-icon-arrowthick-1-n'},
+            //icons: {primary: 'ui-icon-arrowthick-1-n'},
+            create : removeClassesCreateHandler,
             text : false
         });
         this.element.find('#move_down_b').button({
-            icons: {primary: 'ui-icon-arrowthick-1-s'},
+            //icons: {primary: 'ui-icon-arrowthick-1-s'},
+	    create : removeClassesCreateHandler,
             text : false
         });
         this.element.find('#move_up_down').buttonset();
         this.element.find('#insert_above_b').button({
-            icons: {primary: 'ui-icon-arrowthickstop-1-n'},
+            //icons: {primary: 'ui-icon-arrowthickstop-1-n'},
+	    create : removeClassesCreateHandler,
             text : false
         });
         this.element.find('#insert_below_b').button({
-            icons: {primary: 'ui-icon-arrowthickstop-1-s'},
-            text : false
+            //icons: {primary: 'ui-icon-arrowthickstop-1-s'},
+            create : removeClassesCreateHandler,
+	    text : false
         });
         this.element.find('#insert_above_below').buttonset();
         this.element.find('#run_b').button({
-            icons: {primary: 'ui-icon-play'},
-            text : false
+            //icons: {primary: 'ui-icon-play'},
+            create : removeClassesCreateHandler,
+	    text : false
         });
         this.element.find('#interrupt_b').button({
-            icons: {primary: 'ui-icon-stop'},
-            text : false
+            //icons: {primary: 'ui-icon-stop'},
+            create : removeClassesCreateHandler,
+	    text : false
         });
         this.element.find('#run_int').buttonset();
     };
@@ -147,7 +169,7 @@ var IPython = (function (IPython) {
         this.element.toggle();
         IPython.layout_manager.do_resize();
     };
-
+   
 
     IPython.ToolBar = ToolBar;
 
