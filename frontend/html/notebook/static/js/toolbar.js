@@ -25,9 +25,7 @@ var IPython = (function (IPython) {
     var removeClassesCreateHandler = function(event, ui) {
     	var that = this;
     	$.each(classesToRemove, function(idx, val) {
-        	$(that).removeClass(val);
-		$(that).css({"padding":"3px 12px"});
-		$(that).css({"background-color":"#f4f4f4"});
+        	$(that).removeClass(val);		
     	});
     };
 
@@ -42,7 +40,8 @@ var IPython = (function (IPython) {
         this.element.find('#cell_type').addClass('ui-widget ui-widget-content');
         this.element.find('#save_b').button({
             //icons : {primary: 'ui-icon-disk'},
-	    create : removeClassesCreateHandler,	    
+	    create : removeClassesCreateHandler,
+	    padding: "3px 12px",	    
             text : false
         });
         this.element.find('#cut_b').button({
