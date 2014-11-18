@@ -121,16 +121,16 @@ var IPython = (function (IPython) {
             } else if (event.which === key.ENTER && event.shiftKey) {
                 that.execute_selected_cell();
                 IPython.notebook.insert_cell_below(IPython.notebook.currentCode);	// By iMathResearch S.L.
-                IPython.notebook.scroll_to_bottom();	// By iMathResearch S.L.
+                //IPython.notebook.scroll_to_bottom();	// By iMathResearch S.L.
                 return false;
             } else if (event.which === key.ENTER && event.ctrlKey) {
                 that.execute_selected_cell({terminal:true});
                 IPython.notebook.insert_cell_below(IPython.notebook.currentCode);	// By iMathResearch S.L.
-                IPython.notebook.scroll_to_bottom();	// By iMathResearch S.L.
+                //IPython.notebook.scroll_to_bottom();	// By iMathResearch S.L.
                 return false;
-            } else if (event.which === key.ENTER && !event.shiftKey && !event.ctrlKey) {
-                IPython.notebook.scroll_to_bottom();	// By iMathResearch S.L.
-                return false;
+            //} else if (event.which === key.ENTER && !event.shiftKey && !event.ctrlKey) {
+                //IPython.notebook.scroll_to_bottom();	// By iMathResearch S.L.
+                //return false;
             } else if (event.which === 77 && event.ctrlKey && that.control_key_active == false) {
                 that.control_key_active = true;
                 return false;
@@ -1128,7 +1128,7 @@ var IPython = (function (IPython) {
             };
         };
         this.dirty = true;
-        that.scroll_to_bottom();
+        //that.scroll_to_bottom();
     };
 
 

@@ -194,7 +194,7 @@ var IPython = (function (IPython) {
 
         // append with dynamic=true
         this.append_output(json, true);
-        IPython.notebook.scroll_to_bottom();	// By iMathResearch S.L.
+        //IPython.notebook.scroll_to_bottom();	// By iMathResearch S.L.
     };
 
 
