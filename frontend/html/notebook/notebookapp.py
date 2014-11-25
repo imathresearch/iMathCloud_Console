@@ -48,7 +48,7 @@ from .handlers import (LoginHandler, LogoutHandler,
     MainKernelHandler, KernelHandler, KernelActionHandler, IOPubHandler,
     ShellHandler, NotebookRootHandler, NotebookHandler, NotebookCopyHandler,
     RSTHandler, AuthenticatedFileHandler, PrintNotebookHandler,
-    MainClusterHandler, ClusterProfileHandler, ClusterActionHandler
+    MainClusterHandler, ClusterProfileHandler, ClusterActionHandler, StaticFileHandlerIMATH
 )
 from .notebookmanager import NotebookManager
 from .clustermanager import ClusterManager
@@ -119,6 +119,9 @@ class NotebookWebApplication(web.Application):
     def __init__(self, ipython_app, kernel_manager, notebook_manager, 
                  cluster_manager, log,
                  base_project_url, settings_overrides):
+        
+        static_path = os.path.join(os.path.dirname(__file__), "static")
+                     
         handlers = [
             (r"/", ProjectDashboardHandler),
             (r"/login", LoginHandler),
@@ -156,6 +159,7 @@ class NotebookWebApplication(web.Application):
             static_path=os.path.join(os.path.dirname(__file__), "static"),
             cookie_secret=os.urandom(1024),
             login_url="%s/login"%(base_project_url.rstrip('/')),
+            static_handler_class=StaticFileHandlerIMATH,
         )
 
         # allow custom overrides for the tornado web app.

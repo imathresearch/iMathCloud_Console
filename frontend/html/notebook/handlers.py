@@ -189,6 +189,19 @@ class AuthenticatedFileHandler(AuthenticatedHandler, web.StaticFileHandler):
         return web.StaticFileHandler.get(self, path)
 
 
+class StaticFileHandlerIMATH(web.StaticFileHandler):
+    """static files should only be accessible when logged in"""
+
+    def set_default_headers(self):
+        self.add_header('Access-Control-Allow-Origin', self.request.headers.get('Origin', '*'))
+    
+    def head(self, path):
+        web.StaticFileHandler.get(self, path, include_body=False)
+        
+    def get(self, path):
+        return web.StaticFileHandler.get(self, path)
+
+
 class ProjectDashboardHandler(AuthenticatedHandler):
 
     @authenticate_unless_readonly
