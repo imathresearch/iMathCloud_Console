@@ -1,6 +1,6 @@
 
 
-.cm-s-ipython span.cm-keyword {color: #008000; font-weight: bold;}
+/*.cm-s-ipython span.cm-keyword {color: #008000; font-weight: bold;}
 .cm-s-ipython span.cm-number {color: #000080;}
 .cm-s-ipython span.cm-operator {color: #AA22FF; font-weight: bold;}
 .cm-s-ipython span.cm-meta {color: #AA22FF;}
@@ -8,7 +8,40 @@
 .cm-s-ipython span.cm-string {color: #BA2121;}
 .cm-s-ipython span.cm-error {color: #f00;}
 .cm-s-ipython span.cm-builtin {color: #008000;}
-.cm-s-ipython span.cm-variable {color: #000000;}
+.cm-s-ipython span.cm-variable {color: #000000;}*/
+
+
+/* IMATH RESEARCH*/
+.cm-s-ipython span.cm-meta {color: #FF1717;}
+.cm-s-ipython span.cm-keyword { line-height: 1em; font-weight: bold; color: #7F0055; }
+.cm-s-ipython span.cm-atom {color: #219;}
+.cm-s-ipython span.cm-number {color: #164;}
+.cm-s-ipython span.cm-def {color: #00f;}
+.cm-s-ipython span.cm-variable {color: black;}
+.cm-s-ipython span.cm-variable-2 {color: #0000C0;}
+.cm-s-ipython span.cm-variable-3 {color: #0000C0;}
+.cm-s-ipython span.cm-property {color: black;}
+.cm-s-ipython span.cm-operator {color: black;}
+.cm-s-ipython span.cm-comment {color: #3F7F5F;}
+.cm-s-ipython span.cm-string {color: #2A00FF;}
+.cm-s-ipython span.cm-string-2 {color: #f50;}
+.cm-s-ipython span.cm-error {color: #f00;}
+.cm-s-ipython span.cm-qualifier {color: #555;}
+.cm-s-ipython span.cm-builtin {color: #30a;}
+.cm-s-ipython span.cm-bracket {color: #cc7;}
+.cm-s-ipython span.cm-tag {color: #170;}
+.cm-s-ipython span.cm-attribute {color: #00c;}
+.cm-s-ipython span.cm-link {color: #219;}
+
+.cm-s-ipython .CodeMirror-matchingbracket {
+    border:1px solid grey;
+    color:black !important;;
+}
+
+/* IMATH RESEARCH*/
+
+
+
 
 /* These classes are not currently used in the python.js mode */
 
