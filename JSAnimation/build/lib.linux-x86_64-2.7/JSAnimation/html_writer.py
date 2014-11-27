@@ -12,6 +12,7 @@ from base64 import b64encode
 
 
 ICON_DIR = os.path.join(os.path.dirname(__file__), 'icons')
+BUFFER_SIZE = 2000000;
 
 
 class _Icons(object):
@@ -170,7 +171,7 @@ JS_INCLUDE = """
 """
 
 
-DISPLAY_TEMPLATE = """
+DISPLAY_TEMPLATE_COMPLETE = """
 <div class="animation" align="center">
     <img id="_anim_img{id}">
     <br>
@@ -189,7 +190,63 @@ DISPLAY_TEMPLATE = """
     <input type="radio" name="state" value="once" {once_checked}> Once </input>
     <input type="radio" name="state" value="loop" {loop_checked}> Loop </input>
     <input type="radio" name="state" value="reflect" {reflect_checked}> Reflect </input>
-  </form>
+  </form>  
+</div>
+
+
+<script language="javascript">
+  /* Instantiate the Animation class. */
+  /* The IDs given should match those used in the template above. */
+  (function() {{
+    var img_id = "_anim_img{id}";
+    var slider_id = "_anim_slider{id}";
+    var loop_select_id = "_anim_loop_select{id}";
+    var frames = new Array({Nframes});
+    {fill_frames}
+
+    /* set a timeout to make sure all the above elements are created before
+       the object is initialized. */
+    setTimeout(function() {{
+        anim{id} = new Animation(frames, img_id, slider_id, {interval}, loop_select_id);
+    }}, 0);
+  }})()
+</script>
+"""
+
+DISPLAY_TEMPLATE = """
+<div class="animation" align="center">
+    <div style="border: 3px solid grey;background-color:#E0ECF8;">
+        <br/>
+        <p align="center"><font color="blue"><strong>IMATH RESEARCH</strong></font></p>
+        <p align="center"><font color="blue">Only part of the animation is being displayed</font></p>
+	<br/>
+        <p align="center"><font color="grey">To visualize the complete animation:</font></p>
+        <p><ol align="center" style="list-style-position:inside">
+     	    <li><font color="grey">Asign the animation to a variable:</font><br/> <code>ani = animation.FuncAnimation(...)</code> </li>
+ 	    <li><font color="grey">Save the animation in a mp4 file using the following sentence:<br/> </font><code>ani.save('animation.mp4', extra_args=['-vcodec', 'libx264'])</code></li>
+	    <li><font color="grey">Display the video using the following sentence:<br/></font><code>iMath.display_video('animation.mp4')</code></li>
+        </ol></p>
+
+    </div>
+    <br/>
+    <img id="_anim_img{id}">
+    <br>
+    <input id="_anim_slider{id}" type="range" style="width:350px" name="points" min="0" max="1" step="1" value="0" onchange="anim{id}.set_frame(parseInt(this.value));"></input>
+    <br>
+    <button onclick="anim{id}.slower()">&#8211;</button>
+    <button onclick="anim{id}.first_frame()"><img class="anim_icon" src="{icons.first}"></button>
+    <button onclick="anim{id}.previous_frame()"><img class="anim_icon" src="{icons.prev}"></button>
+    <button onclick="anim{id}.reverse_animation()"><img class="anim_icon" src="{icons.reverse}"></button>
+    <button onclick="anim{id}.pause_animation()"><img class="anim_icon" src="{icons.pause}"></button>
+    <button onclick="anim{id}.play_animation()"><img class="anim_icon" src="{icons.play}"></button>
+    <button onclick="anim{id}.next_frame()"><img class="anim_icon" src="{icons.next}"></button>
+    <button onclick="anim{id}.last_frame()"><img class="anim_icon" src="{icons.last}"></button>
+    <button onclick="anim{id}.faster()">+</button>
+  <form action="#n" name="_anim_loop_select{id}" class="anim_control">
+    <input type="radio" name="state" value="once" {once_checked}> Once </input>
+    <input type="radio" name="state" value="loop" {loop_checked}> Loop </input>
+    <input type="radio" name="state" value="reflect" {reflect_checked}> Reflect </input>
+  </form>  
 </div>
 
 
@@ -254,6 +311,7 @@ class HTMLWriter(FileMovieWriter):
 
     def __init__(self, fps=30, codec=None, bitrate=None, extra_args=None,
                  metadata=None, embed_frames=False, default_mode='loop'):
+	#print "IN HTMLWriter init"
         self.embed_frames = embed_frames
         self.default_mode = default_mode.lower()
 
@@ -261,11 +319,16 @@ class HTMLWriter(FileMovieWriter):
             self.default_mode = 'loop'
             warnings.warn("unrecognized default_mode: using 'loop'")
 
+	self.total_frame_size = 0;
+	self.under_limit = True;
+	print self.under_limit
         self._saved_frames = list()
         super(HTMLWriter, self).__init__(fps, codec, bitrate,
                                          extra_args, metadata)
 
     def setup(self, fig, outfile, dpi, frame_dir=None):
+	#print "IN HTMLWriter setup"
+	#print self.under_limit;
         if os.path.splitext(outfile)[-1] not in ['.html', '.htm']:
             raise ValueError("outfile must be *.htm or *.html")
 
@@ -282,15 +345,30 @@ class HTMLWriter(FileMovieWriter):
                                       frame_prefix, clear_temp=False)
 
     def grab_frame(self, **savefig_kwargs):
-        if self.embed_frames:
-            suffix = '.' + self.frame_format
-            f = InMemory()
-            self.fig.savefig(f, format=self.frame_format,
+	#print "IN HTMLWriter grab_frame"	
+	if self.under_limit :
+            if self.embed_frames:
+		#print "IN HTMLWriter grab_frame IF"
+            	suffix = '.' + self.frame_format
+            	f = InMemory()
+	        self.fig.savefig(f, format=self.frame_format,
                              dpi=self.dpi, **savefig_kwargs)
-            f.seek(0)
-            self._saved_frames.append(b64encode(f.read()).decode('ascii'))
-        else:
-            return super(HTMLWriter, self).grab_frame(**savefig_kwargs)
+            	f.seek(0)
+	    	encode_fig = b64encode(f.read()).decode('ascii');
+	    	frame_size = sys.getsizeof(encode_fig);		
+		current_size = self.total_frame_size + frame_size
+	    	if current_size < BUFFER_SIZE:
+	    	    self._saved_frames.append(encode_fig);
+		    self.total_frame_size = self.total_frame_size + frame_size
+	        else:		  
+		    self.under_limit = False;
+		    		
+
+            #self._saved_frames.append(b64encode(f.read()).decode('ascii'))
+ 				
+            else:	        
+                return super(HTMLWriter, self).grab_frame(**savefig_kwargs)
+	
 
     def _run(self):
         # make a ducktyped subprocess standin
@@ -301,6 +379,7 @@ class HTMLWriter(FileMovieWriter):
                 return ('', '')
         self._proc = ProcessStandin()
 
+	#print "In _run htmlWriter"
         # save the frames to an html file
         if self.embed_frames:
             fill_frames = _embedded_frames(self._saved_frames,
@@ -319,7 +398,12 @@ class HTMLWriter(FileMovieWriter):
 
         with open(self.outfile, 'w') as of:
             of.write(JS_INCLUDE)
-            of.write(DISPLAY_TEMPLATE.format(id=self.new_id(),
+	    if self.under_limit:
+		TEMPLATE = DISPLAY_TEMPLATE_COMPLETE
+	    else:
+		TEMPLATE = DISPLAY_TEMPLATE
+ 
+            of.write(TEMPLATE.format(id=self.new_id(),
                                              Nframes=len(self._temp_names),
                                              fill_frames=fill_frames,
                                              interval=interval,

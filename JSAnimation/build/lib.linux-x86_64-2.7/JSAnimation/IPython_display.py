@@ -6,6 +6,8 @@ import random
 import os
 
 
+
+
 __all__ = ['anim_to_html', 'display_animation']
 
 
@@ -80,7 +82,7 @@ def anim_to_html(anim, fps=None, embed_frames=True, default_mode='loop'):
         return html
 
 
-def display_animation(anim, **kwargs):
+def display_animation(anim, **kwargs):    
     """Display the animation with an IPython HTML object"""
     from IPython.display import HTML
     return HTML(anim_to_html(anim, **kwargs))
