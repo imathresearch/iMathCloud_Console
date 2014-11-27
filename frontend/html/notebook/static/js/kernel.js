@@ -9,7 +9,8 @@
 // Kernel
 //============================================================================
 
-var IMATH_PORT = "8080";
+var IMATH_PORT = "80";
+var IMATH_HOST = "158.109.125.112"
 
 var IPython = (function (IPython) {
 
@@ -159,8 +160,8 @@ var IPython = (function (IPython) {
         this.stop_channels();
         
 	
-        var url_complete_shell = "ws://127.0.0.1:" + IMATH_PORT + "/iMathCloud/websocket/" + this.kernel_id + "/shell/" + portConsole;
-	var url_complete_iopub = "ws://127.0.0.1:" + IMATH_PORT + "/iMathCloud/websocket/" + this.kernel_id + "/iopub/" + portConsole; 
+        var url_complete_shell = "ws://" + IMATH_HOST + ":" + IMATH_PORT + "/iMathCloud/websocket/" + this.kernel_id + "/shell/" + portConsole;
+	var url_complete_iopub = "ws://" + IMATH_HOST + ":" + IMATH_PORT + "/iMathCloud/websocket/" + this.kernel_id + "/iopub/" + portConsole; 
 	
 	var ws_url = this.ws_url + this.kernel_url;       
 	
