@@ -269,10 +269,10 @@ class LogoutHandler(AuthenticatedHandler):
 class NewHandler(AuthenticatedHandler):
 
     @web.authenticated
-    def get(self):
+    def get(self, notebook_type):
         nbm = self.application.notebook_manager
         project = nbm.notebook_dir
-        notebook_id = nbm.new_notebook()
+        notebook_id = nbm.new_notebook(notebook_type)
         self.render(
             'notebook.html', project=project,
             notebook_id=notebook_id,
@@ -347,8 +347,7 @@ class MainKernelHandler(AuthenticatedHandler):
         nbm = self.application.notebook_manager
         notebook_id = self.get_argument('notebook', default=None)
         kernel_id = km.start_kernel(notebook_id, cwd=nbm.notebook_dir)
-        data = {'ws_url':self.ws_url,'kernel_id':kernel_id}
-	print data
+        data = {'ws_url':self.ws_url,'kernel_id':kernel_id}	
         self.set_header('Location', '/'+kernel_id)
         self.finish(jsonapi.dumps(data))
 
@@ -624,7 +623,7 @@ class NotebookRootHandler(AuthenticatedHandler):
     def get(self):
         nbm = self.application.notebook_manager
         km = self.application.kernel_manager
-        files = nbm.list_notebooks()
+        files = nbm.list_notebooks()	
         for f in files :
             f['kernel_id'] = km.kernel_for_notebook(f['notebook_id'])
         self.finish(jsonapi.dumps(files))
@@ -636,6 +635,7 @@ class NotebookRootHandler(AuthenticatedHandler):
         format = self.get_argument('format', default='json')
         name = self.get_argument('name', default=None)
         if body:
+	    """TODO: when we use this REST Handler we must change the save_new_notebook to accept path as a name"""
             notebook_id = nbm.save_new_notebook(body, name=name, format=format)
         else:
             notebook_id = nbm.new_notebook()

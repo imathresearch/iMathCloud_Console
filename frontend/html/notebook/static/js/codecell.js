@@ -172,7 +172,14 @@ var IPython = (function (IPython) {
         	if (user == "ROOT") {
         		alert("Login is required within iMathCloud")
         	} else {
-				var msg_id = this.kernel.execute(this.get_text(), callbacks, {silent: false});
+				var commands = this.get_text();				
+				if(commands.indexOf("USER_ROOT") == -1){
+					if (typeConsole == "r"){
+						commands = "%%R \n" + commands;
+						console.log(commands);								
+					}
+				}
+				var msg_id = this.kernel.execute(commands, callbacks, {silent: false});
         	}
         }
     };

@@ -73,14 +73,29 @@ class NotebookManager(LoggingConfigurable):
 
             dict(notebook_id=notebook,name=name)
         """
-        names = glob.glob(os.path.join(self.notebook_dir,
+	import fnmatch
+	import os
+
+	# BY IMATH
+	names = []
+	for root, dirnames, filenames in os.walk(self.notebook_dir):
+  		for filename in fnmatch.filter(filenames, '*' + self.filename_ext):
+     			names.append(os.path.join(root, filename))
+	
+	"""print "Listing notebooks"
+	print "Notebook dir"
+	print self.notebook_dir
+	print os.path.join(self.notebook_dir,'**','*' + self.filename_ext)
+        names = glob.glob(os.path.join(self.notebook_dir, '**',
                                        '*' + self.filename_ext))
+	print "Notebooks"
+	print names
         names = [os.path.splitext(os.path.basename(name))[0]
                  for name in names]
-
+	"""
         data = []
         for name in names:
-            if name not in self.rev_mapping:
+            if name not in self.rev_mapping:		
                 notebook_id = self.new_notebook_id(name)
             else:
                 notebook_id = self.rev_mapping[name]
@@ -100,7 +115,7 @@ class NotebookManager(LoggingConfigurable):
         #                 'file://'+self.get_path_by_name(name).encode('utf-8')))
         
         notebook_id = unicode(uuid.uuid4())
-        
+        	
         self.mapping[notebook_id] = name
         self.rev_mapping[name] = notebook_id
         return notebook_id
@@ -112,22 +127,23 @@ class NotebookManager(LoggingConfigurable):
         del self.rev_mapping[name]
 
     def notebook_exists(self, notebook_id):
-        """Does a notebook exist?"""
-        if notebook_id not in self.mapping:
+        """Does a notebook exist?"""	
+        if notebook_id not in self.mapping:	    
             return False
-        path = self.get_path_by_name(self.mapping[notebook_id])
-        return os.path.isfile(path)
+        #path = self.get_path_by_name(self.mapping[notebook_id])	
+        return os.path.isfile(self.mapping[notebook_id])		# BY IMATH
 
     def find_path(self, notebook_id):
         """Return a full path to a notebook given its notebook_id."""
         try:
             name = self.mapping[notebook_id]
-        except KeyError:
+        except KeyError:	    
             raise web.HTTPError(404, u'Notebook does not exist: %s' % notebook_id)
-        return self.get_path_by_name(name)
+        #return self.get_path_by_name(name)
+	return name
 
     def get_path_by_name(self, name):
-        """Return a full path to a notebook given its name."""
+        """Return a full path to a notebook given its name."""	
         filename = name + self.filename_ext
         path = os.path.join(self.notebook_dir, filename)
         return path       
@@ -150,7 +166,7 @@ class NotebookManager(LoggingConfigurable):
     def get_notebook_object(self, notebook_id):
         """Get the NotebookNode representation of a notebook by notebook_id."""
         path = self.find_path(notebook_id)
-        if not os.path.isfile(path):
+        if not os.path.isfile(path):	   
             raise web.HTTPError(404, u'Notebook does not exist: %s' % notebook_id)
         info = os.stat(path)
         last_modified = datetime.datetime.utcfromtimestamp(info.st_mtime)
@@ -161,8 +177,9 @@ class NotebookManager(LoggingConfigurable):
                 nb = current.reads(s, u'json')
             except:
                 raise web.HTTPError(500, u'Unreadable JSON notebook.')
-        # Always use the filename as the notebook name.
-        nb.metadata.name = os.path.splitext(os.path.basename(path))[0]
+        # Always use the filename as the notebook name.	
+        #nb.metadata.name = os.path.splitext(os.path.basename(path))[0]
+	nb.metadata.name = path 					# BY IMATH
         return last_modified, nb
 
     def save_new_notebook(self, data, name=None, format=u'json'):
@@ -185,35 +202,38 @@ class NotebookManager(LoggingConfigurable):
             except AttributeError:
                 raise web.HTTPError(400, u'Missing notebook name')
         nb.metadata.name = name
-
+	
+	
         notebook_id = self.new_notebook_id(name)
         self.save_notebook_object(notebook_id, nb)
         return notebook_id
 
     def save_notebook(self, notebook_id, data, name=None, format=u'json'):
         """Save an existing notebook by notebook_id."""
+	
         if format not in self.allowed_formats:
             raise web.HTTPError(415, u'Invalid notebook format: %s' % format)
 
         try:
-            nb = current.reads(data.decode('utf-8'), format)
+            nb = current.reads(data.decode('utf-8'), format)	    
         except:
             raise web.HTTPError(400, u'Invalid JSON data')
-
+	
         if name is not None:
             nb.metadata.name = name
         self.save_notebook_object(notebook_id, nb)
 
     def save_notebook_object(self, notebook_id, nb):
         """Save an existing notebook object by notebook_id."""
-        if notebook_id not in self.mapping:
+        if notebook_id not in self.mapping:	    
             raise web.HTTPError(404, u'Notebook does not exist: %s' % notebook_id)
         old_name = self.mapping[notebook_id]
         try:
             new_name = nb.metadata.name
         except AttributeError:
             raise web.HTTPError(400, u'Missing notebook name')
-        path = self.get_path_by_name(new_name)
+        #path = self.get_path_by_name(new_name)
+	path = new_name					# BY IMATH
         try:
             with open(path,'w') as f:
                 current.write(nb, f, u'json')
@@ -227,7 +247,7 @@ class NotebookManager(LoggingConfigurable):
                     current.write(nb, f, u'py')
             except Exception as e:
                 raise web.HTTPError(400, u'Unexpected error while saving notebook as script: %s' % e)
-        
+        	
         if old_name != new_name:
             old_path = self.get_path_by_name(old_name)
             if os.path.isfile(old_path):
@@ -235,15 +255,15 @@ class NotebookManager(LoggingConfigurable):
             if self.save_script:
                 old_pypath = os.path.splitext(old_path)[0] + '.py'
                 if os.path.isfile(old_pypath):
-                    os.unlink(old_pypath)
+                    os.unlink(old_pypath)	   
             self.mapping[notebook_id] = new_name
             self.rev_mapping[new_name] = notebook_id
-            del self.rev_mapping[old_name]
+            del self.rev_mapping[old_name]	
 
     def delete_notebook(self, notebook_id):
         """Delete notebook by notebook_id."""
         path = self.find_path(notebook_id)
-        if not os.path.isfile(path):
+        if not os.path.isfile(path):	  
             raise web.HTTPError(404, u'Notebook does not exist: %s' % notebook_id)
         os.unlink(path)
         self.delete_notebook_id(notebook_id)
@@ -265,14 +285,18 @@ class NotebookManager(LoggingConfigurable):
                 i = i+1
         return path, name
 
-    def new_notebook(self):
+    def new_notebook(self, notebook_type):
         """Create a new notebook and return its notebook_id."""
+	
         path, name = self.increment_filename('Untitled')
-        notebook_id = self.new_notebook_id(name)
-        metadata = current.new_metadata(name=name)
-        nb = current.new_notebook(metadata=metadata)
+        #notebook_id = self.new_notebook_id(name)
+	notebook_id = self.new_notebook_id(path)				# BY IMATH
+        metadata = current.new_metadata(name=path, typeConsole=notebook_type)
+        nb = current.new_notebook(metadata=metadata)	
+
         with open(path,'w') as f:
             current.write(nb, f, u'json')
+		
         return notebook_id
 
     def copy_notebook(self, notebook_id):
@@ -281,6 +305,7 @@ class NotebookManager(LoggingConfigurable):
         name = nb.metadata.name + '-Copy'
         path, name = self.increment_filename(name)
         nb.metadata.name = name
-        notebook_id = self.new_notebook_id(name)
+        #notebook_id = self.new_notebook_id(name)
+	notebook_id = self.new_notebook_id(path)
         self.save_notebook_object(notebook_id, nb)
         return notebook_id

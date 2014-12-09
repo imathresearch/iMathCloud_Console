@@ -77,6 +77,7 @@ _kernel_action_regex = r"(?P<action>restart|interrupt)"
 _notebook_id_regex = r"(?P<notebook_id>\w+-\w+-\w+-\w+-\w+)"
 _profile_regex = r"(?P<profile>[^\/]+)" # there is almost no text that is invalid
 _cluster_action_regex = r"(?P<action>start|stop)"
+_notebook_type = r"(?P<notebook_type>python|r)"
 
 
 LOCALHOST = '127.0.0.1'
@@ -126,7 +127,7 @@ class NotebookWebApplication(web.Application):
             (r"/", ProjectDashboardHandler),
             (r"/login", LoginHandler),
             (r"/logout", LogoutHandler),
-            (r"/new", NewHandler),
+            (r"/new/%s" % _notebook_type, NewHandler),
             (r"/%s" % _notebook_id_regex, NamedNotebookHandler),
             (r"/%s/copy" % _notebook_id_regex, NotebookCopyHandler),
             (r"/%s/print" % _notebook_id_regex, PrintNotebookHandler),

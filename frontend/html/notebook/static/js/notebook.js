@@ -542,7 +542,7 @@ var IPython = (function (IPython) {
             };
             this.dirty = true;
         };
-        console.log("DELETING CELL");
+        
         return this;
     };
 
@@ -1153,7 +1153,7 @@ var IPython = (function (IPython) {
     };
 
 
-    Notebook.prototype.set_notebook_name = function (name) {
+    Notebook.prototype.set_notebook_name = function (name) {	
         this.notebook_name = name;
     };
 
@@ -1176,7 +1176,7 @@ var IPython = (function (IPython) {
             this.delete_cell(0);
         };
         // Save the metadata and name.
-        this.metadata = data.metadata;
+        this.metadata = data.metadata;	
         this.notebook_name = data.metadata.name;
         // Only handle 1 worksheet for now.
         var worksheet = data.worksheets[0];
@@ -1244,7 +1244,7 @@ var IPython = (function (IPython) {
 
     Notebook.prototype.save_notebook = function () {
         // We may want to move the name/id/nbformat logic inside toJSON?
-        var data = this.toJSON();
+        var data = this.toJSON();	
         data.metadata.name = this.notebook_name;
         data.nbformat = this.nbformat;
         data.nbformat_minor = this.nbformat_minor;
@@ -1258,6 +1258,7 @@ var IPython = (function (IPython) {
             success : $.proxy(this.save_notebook_success,this),
             error : $.proxy(this.save_notebook_error,this)
         };
+	
         $([IPython.events]).trigger('notebook_saving.Notebook');
         var url = $('body').data('baseProjectUrl') + 'save_notebooks/' + this.notebook_id;
         $.ajax(url, settings);
