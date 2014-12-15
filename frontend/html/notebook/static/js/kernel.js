@@ -416,10 +416,12 @@ var IPython = (function (IPython) {
 		this.iopub_channel.send("[IMATH]Ping");		
 		return;
 	}
-	
+
         var content = reply.content;
         var msg_type = reply.header.msg_type;
         var callbacks = this.get_callbacks_for_msg(reply.parent_header.msg_id);
+
+
         if (msg_type !== 'status' && callbacks === undefined) {
             // Message not from one of this notebook's cells and there are no
             // callbacks to handle it.
@@ -429,6 +431,12 @@ var IPython = (function (IPython) {
         if (output_types.indexOf(msg_type) >= 0) {
             var cb = callbacks['output'];
             if (cb !== undefined) {
+		console.log("call callbacks");
+		if (msg_type == 'pyerr'){
+			if(content.ename == "RInterpreterError"){				
+				content.traceback = [content.traceback[content.traceback.length-1]];			
+			}		
+		}
                 cb(msg_type, content);
             }
         } else if (msg_type === 'status') {
