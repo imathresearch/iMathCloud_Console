@@ -139,13 +139,21 @@ var IPython = (function (IPython) {
 		if (k != null){
 		    sh_ch = k.get_shellChannel();
 		    if(sh_ch != null && sh_ch.readyState == 1){			
-			var sentence = env.concat(path);	
+			var sentence = env.concat(path);
 			IPython.notebook.insert_cell_above('code');
 			var cell = IPython.notebook.get_selected_cell();				
 			cell.set_text(sentence);				
 			IPython.notebook.execute_selected_cell({isFile:true});			
 			index = IPython.notebook.find_cell_index(cell);					
 			IPython.notebook.delete_cell(index);
+
+			IPython.notebook.insert_cell_above('code');
+			var cell = IPython.notebook.get_selected_cell();				
+			cell.set_text(banned_packages);				
+			IPython.notebook.execute_selected_cell({isFile:true});			
+			index = IPython.notebook.find_cell_index(cell);					
+			IPython.notebook.delete_cell(index);
+
 		    	clearInterval(id);
 		    }
 
