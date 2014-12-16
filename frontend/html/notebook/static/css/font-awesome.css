@@ -6,8 +6,8 @@
  * -------------------------- */
 @font-face {
   font-family: 'FontAwesome';
-  src: url('http://localhost:8080/iMathCloud/fonts/fontawesome-webfont.eot?v=4.0.3');
-  src: url('http://localhost:8080/iMathCloud/fonts/fontawesome-webfont.eot?#iefix&v=4.0.3') format('embedded-opentype'), url('http://localhost:8080/iMathCloud/fonts/fontawesome-webfont.woff?v=4.0.3') format('woff'), url('http://localhost:8080/iMathCloud/fonts/fontawesome-webfont.ttf?v=4.0.3') format('truetype'), url('http://localhost:8080/iMathCloud/fonts/fontawesome-webfont.svg?v=4.0.3#fontawesomeregular') format('svg');
+  src: url('http://158.109.125.112/iMathCloud/fonts/fontawesome-webfont.eot?v=4.0.3');
+  src: url('http://158.109.125.112/iMathCloud/fonts/fontawesome-webfont.eot?#iefix&v=4.0.3') format('embedded-opentype'), url('http://158.109.125.112/iMathCloud/fonts/fontawesome-webfont.woff?v=4.0.3') format('woff'), url('http://158.109.125.112/iMathCloud/fonts/fontawesome-webfont.ttf?v=4.0.3') format('truetype'), url('http://158.109.125.112/iMathCloud/fonts/fontawesome-webfont.svg?v=4.0.3#fontawesomeregular') format('svg');
   font-weight: normal;
   font-style: normal;
 }
