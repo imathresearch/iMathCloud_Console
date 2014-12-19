@@ -77,7 +77,7 @@ _kernel_action_regex = r"(?P<action>restart|interrupt)"
 _notebook_id_regex = r"(?P<notebook_id>\w+-\w+-\w+-\w+-\w+)"
 _profile_regex = r"(?P<profile>[^\/]+)" # there is almost no text that is invalid
 _cluster_action_regex = r"(?P<action>start|stop)"
-_notebook_type = r"(?P<notebook_type>python|r)"
+_notebook_type = r"(?P<notebook_type>python|r|octave)"
 
 
 LOCALHOST = '127.0.0.1'
